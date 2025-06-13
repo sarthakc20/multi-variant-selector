@@ -83,14 +83,14 @@
             {% endif %}
           >
             <span>
-              {%- if product.selected_or_first_available_variant == null -%}
-                {{ 'products.product.unavailable' | t }}
-              {%- elsif product.selected_or_first_available_variant.available == false or quantity_rule_soldout -%}
-                {{ 'products.product.sold_out' | t }}
-              {%- else -%}
-                {{ 'products.product.add_to_cart' | t }}
-              {%- endif -%}
-            </span>
+            {%- if product.selected_or_first_available_variant == null -%}
+              {{ 'products.product.unavailable' | t }}<span class="multi-price-amount"></span>
+            {%- elsif product.selected_or_first_available_variant.available == false or quantity_rule_soldout -%}
+              {{ 'products.product.sold_out' | t }}<span class="multi-price-amount"></span>
+            {%- else -%}
+              {{ 'products.product.add_to_cart' | t }}<span class="multi-price-amount"></span>
+            {%- endif -%}
+          </span>
             {%- render 'loading-spinner' -%}
           </button>
           {%- if show_dynamic_checkout -%}
@@ -149,3 +149,28 @@
     <script src="{{ 'pickup-availability.js' | asset_url }}" defer="defer"></script>
   {%- endif -%}
 </div>
+
+{%- if show_multi_price -%}
+  <script>
+    // Find the multi price span inside the add to cart button
+    function updateMultiPriceAmount() {
+      var activeBtn = document.querySelector('.buy-multi-btn.active');
+      var priceSpan = document.querySelector('.product-form__submit .multi-price-amount');
+      if (!activeBtn || !priceSpan) return;
+      var max = activeBtn.getAttribute('data-max');
+      var price = '';
+      if (max === '1') price = ' - ₹10.00';
+      else if (max === '3') price = ' - ₹25.20';
+      else if (max === '5') price = ' - ₹40.00';
+      priceSpan.textContent = price;
+    }
+    // Initial update
+    updateMultiPriceAmount();
+    // Listen for buy-multi-btn clicks
+    document.querySelectorAll('.buy-multi-btn').forEach(function(btn) {
+      btn.addEventListener('click', function() {
+        setTimeout(updateMultiPriceAmount, 10); // Wait for .active class to update
+      });
+    });
+  </script>
+{%- endif -%}
