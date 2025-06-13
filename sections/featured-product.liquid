@@ -473,13 +473,13 @@ if (addToCartBtn) {
                 <div class="selected-colors-summary" style="margin: 0.5em 0 1em 0; font-size: 0.95em;">Selected Colors:</div>
 
                 {%- when 'buy_buttons' -%}
-                  {%- render 'buy-buttons',
-                    block: block,
-                    product: product,
-                    product_form_id: product_form_id,
-                    section_id: section.id,
-                    show_multi_price: true
-                  -%}
+                {%- render 'buy-buttons',
+                  block: block,
+                  product: product,
+                  product_form_id: product_form_id,
+                  section_id: section.id,
+                  show_multi_price: true
+                -%}
                 {%- when 'custom_liquid' -%}
                   {{ block.settings.custom_liquid }}
                   {%- when 'collapsible_tab' -%}
