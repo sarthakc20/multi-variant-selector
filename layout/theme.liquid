@@ -255,6 +255,8 @@
       }
     {% endstyle %}
 
+    {{ 'global.css' | asset_url | stylesheet_tag }}
+
     {{ 'base.css' | asset_url | stylesheet_tag }}
     <link rel="stylesheet" href="{{ 'component-cart-items.css' | asset_url }}" media="print" onload="this.media='all'">
 

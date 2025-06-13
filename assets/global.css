@@ -1,0 +1,49 @@
+:root {
+  /* Font Variables */
+  --font-primary: "Inter", sans-serif;
+  --font-secondary: "Poppins", sans-serif;
+
+  /* Color Variables */
+  --color-primary-text: #000000;
+  --color-secondary-text: #000001;
+  --color-primary-bg: #fff8e7;
+  --color-secondary-bg: #f2f2f2;
+  --color-highlight: #54b952;
+  --color-light-bg: #d1fae5;
+  --color-inverse: #a6a6a6;
+  --color-alternative: #ffc107;
+  --color-badge-label: #065f46;
+  --color-warning: #ff0000;
+  --color-button-bg-primary: #7744d6;
+  --color-button-bg-hover: #000000;
+  --color-white: #ffffff;
+
+  /* Button Styles */
+  --btn-font-family: var(--font-primary);
+  --btn-font-weight: 600;
+  --btn-font-size: 20px;
+  --btn-line-height: 100%;
+  --btn-letter-spacing: 0%;
+  --btn-bg-color: var(--color-button-bg-primary);
+  --btn-radius: 31px;
+  --btn-hover-bg-color: var(--color-button-bg-hover);
+}
+
+.button-primary {
+  font-family: var(--btn-font-family);
+  font-weight: var(--btn-font-weight);
+  font-size: var(--btn-font-size);
+  line-height: var(--btn-line-height);
+  letter-spacing: var(--btn-letter-spacing);
+  background-color: var(--btn-bg-color);
+  color: var(--color-white);
+  border-radius: var(--btn-radius);
+  padding: 12px 24px;
+  border: none;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.button-primary:hover {
+  background-color: var(--btn-hover-bg-color);
+}
