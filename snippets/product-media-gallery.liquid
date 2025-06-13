@@ -125,34 +125,12 @@
         {%- endunless -%}
       {%- endfor -%}
     </ul>
-    <div class="slider-buttons quick-add-hidden{% if hide_mobile_slider %} small-hide{% endif %}">
-      <button
-        type="button"
-        class="slider-button slider-button--prev"
-        name="previous"
-        aria-label="{{ 'general.slider.previous_slide' | t }}"
-      >
-        <span class="svg-wrapper">
-          {{- 'icon-caret.svg' | inline_asset_content -}}
-        </span>
-      </button>
-      <div class="slider-counter caption">
-        <span class="slider-counter--current">1</span>
-        <span aria-hidden="true"> / </span>
-        <span class="visually-hidden">{{ 'general.slider.of' | t }}</span>
-        <span class="slider-counter--total">{{ media_count }}</span>
-      </div>
-      <button
-        type="button"
-        class="slider-button slider-button--next"
-        name="next"
-        aria-label="{{ 'general.slider.next_slide' | t }}"
-      >
-        <span class="svg-wrapper">
-          {{- 'icon-caret.svg' | inline_asset_content -}}
-        </span>
-      </button>
-    </div>
+    <button type="button" class="main-arrow main-arrow--left" aria-label="Previous" disabled>
+      <span class="svg-wrapper">{{- 'icon-caret.svg' | inline_asset_content -}}</span>
+    </button>
+    <button type="button" class="main-arrow main-arrow--right" aria-label="Next">
+      <span class="svg-wrapper">{{- 'icon-caret.svg' | inline_asset_content -}}</span>
+    </button>
   </slider-component>
   {%- if first_3d_model -%}
     <button
@@ -330,3 +308,89 @@
     </slider-component>
   {%- endif -%}
 </media-gallery>
+
+<style>
+.main-arrow {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  z-index: 10;
+  background: #fff;
+  border: 1px solid #ddd;
+  border-radius: 50%;
+  width: 36px;
+  height: 36px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.07);
+  cursor: pointer;
+  transition: opacity 0.2s;
+  opacity: 0.85;
+}
+.main-arrow--left {
+  left: -18px;
+}
+.main-arrow--right {
+  right: -18px;
+}
+.main-arrow[disabled] {
+  opacity: 0.3;
+  cursor: not-allowed;
+  pointer-events: none;
+}
+.slider-component {
+  position: relative;
+}
+</style>
+
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+  // Main gallery and arrows
+  const galleryList = document.getElementById('Slider-Gallery-{{ section.id }}');
+  const leftArrow = galleryList.parentElement.querySelector('.main-arrow--left');
+  const rightArrow = galleryList.parentElement.querySelector('.main-arrow--right');
+
+  // Thumbnails
+  const thumbnailList = document.getElementById('Slider-Thumbnails-{{ section.id }}');
+  if (!thumbnailList) return;
+  const thumbnails = Array.from(thumbnailList.querySelectorAll('button.thumbnail'));
+
+  // Find the currently selected thumbnail index
+  function getCurrentIndex() {
+    return thumbnails.findIndex(btn => btn.getAttribute('aria-current') === 'true');
+  }
+
+  function updateArrowState() {
+    const idx = getCurrentIndex();
+    leftArrow.disabled = idx <= 0;
+    rightArrow.disabled = idx >= thumbnails.length - 1;
+  }
+
+  // Arrow click handlers
+  leftArrow.addEventListener('click', function() {
+    const idx = getCurrentIndex();
+    if (idx > 0) {
+      thumbnails[idx - 1].click();
+      setTimeout(updateArrowState, 50);
+    }
+  });
+  rightArrow.addEventListener('click', function() {
+    const idx = getCurrentIndex();
+    if (idx < thumbnails.length - 1) {
+      thumbnails[idx + 1].click();
+      setTimeout(updateArrowState, 50);
+    }
+  });
+
+  // Also update arrow state on thumbnail click (in case user clicks a thumbnail directly)
+  thumbnails.forEach(btn => {
+    btn.addEventListener('click', function() {
+      setTimeout(updateArrowState, 50);
+    });
+  });
+
+  // Initial state
+  updateArrowState();
+});
+</script>
