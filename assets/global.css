@@ -30,6 +30,9 @@
 }
 
 .button-primary {
+  display: inline-flex;
+  justify-content: center;
+  align-items: center;
   font-family: var(--btn-font-family);
   font-weight: var(--btn-font-weight);
   font-size: var(--btn-font-size);
@@ -46,4 +49,10 @@
 
 .button-primary:hover {
   background-color: var(--btn-hover-bg-color);
+}
+
+/* Disabled state */
+.button-primary:disabled {
+  cursor: not-allowed;
+  opacity: 0.5;
 }
