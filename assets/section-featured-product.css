@@ -295,7 +295,7 @@
   letter-spacing: 0%;
   vertical-align: middle;
   text-transform: capitalize;
-  color: #373A36;
+  color: #373a36;
 }
 
 .choose_color-info-container {
@@ -367,4 +367,20 @@
 
 .featured-product .product-form__buttons {
   max-width: 100%;
+}
+
+.stock-alert {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 8px;
+  font-family: var(--font-primary);
+  font-weight: 500;
+  font-style: italic;
+  font-size: 16px;
+  line-height: 24px;
+  letter-spacing: 0;
+  text-align: center;
+  text-transform: capitalize;
+  color: var(--color-warning);
 }
