@@ -78,13 +78,6 @@
   }
 }
 
-.variant-swatches {
-  display: flex;
-  gap: 30px;
-  flex-wrap: wrap;
-  margin-bottom: 1em;
-}
-
 .variant-swatch {
   width: 46px;
   height: 46px;
@@ -97,6 +90,7 @@
   align-items: center;
   justify-content: center;
   overflow: hidden;
+  position: relative;
   transition: border 0.2s;
 }
 
@@ -229,23 +223,9 @@
 
 .variant-swatches {
   display: flex;
-  gap: 8px;
-  margin-bottom: 0.5em;
-}
-
-.variant-swatch {
-  width: 46px;
-  height: 46px;
-  border-radius: 50%;
-  border: 2px solid #CECECE;
-  background: #fff;
-  cursor: pointer;
-  padding: 0;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  overflow: hidden;
-  position: relative;
+  gap: 30px;
+  flex-wrap: wrap;
+  margin-bottom: 1rem;
 }
 
 .variant-swatch.selected {
