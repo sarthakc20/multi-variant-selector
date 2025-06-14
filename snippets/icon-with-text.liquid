@@ -60,6 +60,9 @@
       <span class="h4 inline-richtext">
         {{- block.settings.heading_1 -}}
       </span>
+      {%- if block.settings.paragraph_1 != blank -%}
+        <p class="icon-with-text__paragraph">{{ block.settings.paragraph_1 }}</p>
+      {%- endif -%}
     </li>
   {%- endunless -%}
   {%- unless heading_2_empty -%}
@@ -82,6 +85,9 @@
       <span class="h4 inline-richtext">
         {{- block.settings.heading_2 -}}
       </span>
+      {%- if block.settings.paragraph_2 != blank -%}
+        <p class="icon-with-text__paragraph">{{ block.settings.paragraph_2 }}</p>
+      {%- endif -%}
     </li>
   {%- endunless -%}
   {%- unless heading_3_empty -%}
@@ -104,6 +110,9 @@
       <span class="h4 inline-richtext">
         {{- block.settings.heading_3 -}}
       </span>
+      {%- if block.settings.paragraph_3 != blank -%}
+        <p class="icon-with-text__paragraph">{{ block.settings.paragraph_3 }}</p>
+      {%- endif -%}
     </li>
   {%- endunless -%}
 </ul>
