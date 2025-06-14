@@ -567,7 +567,12 @@ if (addToCartBtn) {
                           {{ block.settings.heading | default: block.settings.page.title | escape }}
                         </h2>
                       </div>
-                      {{- 'icon-caret.svg' | inline_asset_content -}}
+                      <span class="accordion-icon accordion-icon--plus">
+                        {% render 'accordion-plus-icon' %}
+                      </span>
+                      <span class="accordion-icon accordion-icon--minus">
+                        {% render 'accordion-minus-icon' %}
+                      </span>
                     </summary>
                     <div class="accordion__content rte" id="ProductAccordion-{{ block.id }}-{{ section.id }}">
                       {{ block.settings.content }}

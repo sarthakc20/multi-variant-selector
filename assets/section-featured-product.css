@@ -427,3 +427,19 @@
   border-bottom: none;
 }
 
+.accordion-icon--plus {
+  display: inline-block;
+}
+.accordion-icon--minus {
+  display: none;
+}
+
+/* When accordion is open: hide plus, show minus */
+.product__accordion details[open] .accordion-icon--plus {
+  display: none;
+}
+.product__accordion details[open] .accordion-icon--minus {
+  display: inline-block;
+}
+
+
