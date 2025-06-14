@@ -445,4 +445,24 @@
   padding: 0;
 }
 
+.featured-product .product__text {
+  padding: 9px 24px;
+  background-color: var(--color-primary-bg);
+  border-radius: 32px;
+  font-family: var(--font-secondary);
+  font-weight: 500;
+  font-size: 16px;
+  line-height: 24px;
+  letter-spacing: 0%;
+  vertical-align: middle;
+  text-transform: capitalize;
+  color: var(--color-primary-text);
+}
 
+.star-icons {
+  display: inline-flex;
+  align-items: center;
+}
+.star-icons svg:not(:last-child) {
+  margin-right: 4px;
+}
