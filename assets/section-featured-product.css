@@ -196,7 +196,7 @@
   border-radius: 8px;
   cursor: pointer;
   font-family: var(--font-primary);
-  font-weight: 500;
+  font-weight: 600;
   font-size: 16px;
   line-height: 1.4;
   display: flex;
@@ -205,6 +205,11 @@
   gap: 8px;
   text-align: center;
   transition: all 0.3s ease;
+}
+
+.buy-multi-btn buy-price {
+  font-size: 20px;
+  font-weight: 700;
 }
 
 .last-child-multi-btn {
@@ -446,6 +451,10 @@
   padding: 0;
 }
 
+.product__text-conatiner {
+  display: flex;
+}
+
 .featured-product .product__text {
   padding: 9px 24px;
   background-color: var(--color-primary-bg);
@@ -470,4 +479,59 @@
 
 .featured-product .thumbnail-slider {
   margin-top: 16px;
+}
+
+@media screen and (max-width: 750px) {
+  .product__text-conatiner {
+    justify-content: center;
+  }
+
+  .featured-product .product__text {
+    font-size: 14px;
+  }
+
+  .featured-product .product__title {
+    font-size: 28px;
+  }
+
+  .featured-product .product__description * {
+    font-size: 14px;
+  }
+
+  .buy-multi-toggle {
+    gap: 12px;
+  }
+
+  .buy-multi-wrapper .badge {
+    font-size: 10px;
+    padding: 4px 8px;
+    gap: 2px;
+  }
+
+  .buy-multi-wrapper .badge svg {
+    width: 12px;
+    height: 12px;
+  }
+
+  .buy-multi-wrapper .shipping-badge {
+    gap: 4px;
+    padding: 2px 5px;
+  }
+
+  .buy-multi-wrapper .shipping-badge {
+    font-size: 8px;
+  }
+
+  .buy-multi-wrapper .shipping-badge svg {
+    width: 16px;
+    height: 16px;
+  }
+
+  .buy-multi-btn {
+    font-size: 12px;
+  }
+
+  .buy-multi-btn buy-price {
+    font-size: 16px;
+  }
 }

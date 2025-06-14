@@ -102,21 +102,23 @@
                 {%- when '@app' -%}
                   {% render block %}
                 {%- when 'text' -%}
-                  <span
-                    class="product__text inline-richtext{% if block.settings.text_style == 'uppercase' %} caption-with-letter-spacing{% elsif block.settings.text_style == 'subtitle' %} subtitle{% endif %}"
-                    {{ block.shopify_attributes }}
-                  >
-                    {% if block.settings.enable_stars %}
-                      <span class="star-icons" aria-hidden="true">
-                        {% for i in (1..5) %}
-                          {% render 'star-icon' %}
-                        {% endfor %}
+                  <div class="product__text-conatiner">
+                    <span
+                      class="product__text inline-richtext{% if block.settings.text_style == 'uppercase' %} caption-with-letter-spacing{% elsif block.settings.text_style == 'subtitle' %} subtitle{% endif %}"
+                      {{ block.shopify_attributes }}
+                    >
+                      {% if block.settings.enable_stars %}
+                        <span class="star-icons" aria-hidden="true">
+                          {% for i in (1..5) %}
+                            {% render 'star-icon' %}
+                          {% endfor %}
+                        </span>
+                      {% endif %}
+                      <span style="{% if block.settings.enable_stars %}margin-left: 8px;{% endif %}">
+                        {{- block.settings.text -}}
                       </span>
-                    {% endif %}
-                    <span style="{% if block.settings.enable_stars %}margin-left: 8px;{% endif %}">
-                      {{- block.settings.text -}}
                     </span>
-                  </span>
+                  </div>
                 {%- when 'title' -%}
                   <h2 class="product__title {{ block.settings.heading_size }}" {{ block.shopify_attributes }}>
                     {%- unless placeholder -%}
