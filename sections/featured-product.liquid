@@ -5,277 +5,6 @@
   endif
 -%}
 
-<script>
-document.addEventListener('DOMContentLoaded', function() {
-  // --- Config ---
-  const swatchSelector = '.variant-swatch';
-  const buyBtnSelector = '.buy-multi-btn';
-  const summarySelector = '.selected-colors-summary';
-  const summaryTextSelector = '.selected-colors-text';
-  const addToCartSelector = 'form[data-type="add-to-cart-form"] [type="submit"]';
-  const hiddenInputSelector = 'form[data-type="add-to-cart-form"] input[name="id"]';
-
-  // --- State ---
-  let maxSelect = 3; // Default to 3
-  let selections = [];
-  let variantIdToTitle = {};
-  let swatches = Array.from(document.querySelectorAll(swatchSelector));
-  let addToCartBtn = document.querySelector(addToCartSelector);
-  let hiddenInput = document.querySelector(hiddenInputSelector);
-
-  // --- Map variant id to title for summary ---
-  swatches.forEach(btn => {
-    variantIdToTitle[btn.getAttribute('data-variant-id')] = btn.getAttribute('aria-label');
-  });
-
-  // --- Buy 1/3/5 toggle logic ---
-  const buyBtns = Array.from(document.querySelectorAll(buyBtnSelector));
-  function setActiveBuyBtn(max) {
-    buyBtns.forEach(b => b.classList.remove('active'));
-    const btn = buyBtns.find(b => b.getAttribute('data-max') == String(max));
-    if (btn) btn.classList.add('active');
-  }
-
-  function updateDiscountText() {
-  const perItemSpan = document.querySelector('.multi-buy-per-item');
-  const saveSpan = document.querySelector('.multi-buy-save');
-  // Set your regular prices here
-  const regularPrice = 10.00;
-  let per = '';
-  let save = '';
-  if (maxSelect === 3) {
-    const total = 25.20;
-    per = `₹${(total / 3).toFixed(2)}/Per StickyGrippy`;
-    save = `SAVE ₹${(regularPrice * 3 - total).toFixed(2)}`;
-  } else if (maxSelect === 5) {
-    const total = 40.00;
-    per = `₹${(total / 5).toFixed(2)}/Per StickyGrippy`;
-    save = `SAVE ₹${(regularPrice * 5 - total).toFixed(2)}`;
-  }
-  perItemSpan.textContent = per;
-  saveSpan.textContent = save;
-}
-
-// Call on load and on button switch
-updateDiscountText();
-
-  // Set Buy 3 as default active on load
-  setActiveBuyBtn(3);
-  maxSelect = 3;
-
-  buyBtns.forEach(btn => {
-    btn.addEventListener('click', function() {
-      const newMax = parseInt(btn.getAttribute('data-max'), 10);
-      if (maxSelect !== newMax) {
-        maxSelect = newMax;
-        setActiveBuyBtn(maxSelect);
-        resetSelections();
-        updateDiscountText();
-      }
-    });
-  });
-
-  // --- Swatch click logic ---
-  swatches.forEach(btn => {
-  btn.addEventListener('click', function() {
-    if (btn.hasAttribute('disabled')) return;
-    const vid = btn.getAttribute('data-variant-id');
-    const title = variantIdToTitle[vid];
-
-    let selIndex = selections.findIndex(s => s.id === vid);
-    let sel = selections[selIndex];
-
-    if (sel) {
-      // If not at max, just increment
-      if (totalSelected() < maxSelect) {
-        sel.count++;
-      } else {
-        // At max, increment this one, and decrement/remove others (oldest first, but not this one)
-        sel.count++;
-        let toReduce = 1;
-        // Remove from the oldest selections except the current one
-        for (let i = 0; i < selections.length && toReduce > 0; i++) {
-          if (selections[i].id !== vid) {
-            if (selections[i].count > toReduce) {
-              selections[i].count -= toReduce;
-              toReduce = 0;
-            } else {
-              toReduce -= selections[i].count;
-              selections[i].count = 0;
-            }
-          }
-        }
-        // Remove any with count 0
-        selections = selections.filter(s => s.count > 0);
-      }
-    } else {
-      // Not selected yet
-      if (totalSelected() < maxSelect) {
-        selections.push({id: vid, title: title, count: 1});
-      } else {
-        // Remove from the oldest selection(s)
-        let toReduce = 1;
-        for (let i = 0; i < selections.length && toReduce > 0; i++) {
-          if (selections[i].count > toReduce) {
-            selections[i].count -= toReduce;
-            toReduce = 0;
-          } else {
-            toReduce -= selections[i].count;
-            selections[i].count = 0;
-          }
-        }
-        // Remove any with count 0
-        selections = selections.filter(s => s.count > 0);
-        // Add the new selection
-        selections.push({id: vid, title: title, count: 1});
-      }
-    }
-    updateUI();
-  });
-});
-
-  // --- Helpers ---
-  function totalSelected() {
-    return selections.reduce((sum, s) => sum + s.count, 0);
-  }
-  function removeFirstSelection() {
-    if (selections.length === 0) return;
-    if (selections[0].count > 1) {
-      selections[0].count--;
-    } else {
-      selections.shift();
-    }
-  }
-  function resetSelections() {
-    selections = [];
-    updateUI();
-  }
-  function updateUI() {
-    swatches.forEach(btn => {
-      const vid = btn.getAttribute('data-variant-id');
-      let sel = selections.find(s => s.id === vid);
-      btn.classList.toggle('selected', !!sel);
-      let overlay = btn.querySelector('.swatch-qty-overlay');
-      if (sel) {
-        overlay.textContent = sel.count;
-        overlay.style.opacity = 1;
-      } else {
-        overlay.textContent = '';
-        overlay.style.opacity = 0;
-      }
-    });
-    const summaryDiv = document.querySelector(summarySelector);
-    const summaryTextSpan = document.querySelector(summaryTextSelector);
-
-    if (summaryDiv && summaryTextSpan) {
-      if (selections.length === 0) {
-        summaryTextSpan.textContent = '';
-      } else {
-        summaryTextSpan.textContent = selections
-          .map(s => `${s.title}(${s.count})`)
-          .join(', ');
-      }
-    }
-    if (addToCartBtn) {
-      addToCartBtn.disabled = (totalSelected() !== maxSelect);
-    }
-    if (hiddenInput) {
-      if (maxSelect === 1 && selections.length === 1) {
-        hiddenInput.value = selections[0].id;
-      } else {
-        hiddenInput.value = selections[0] ? selections[0].id : '';
-      }
-    }
-  }
-
-if (addToCartBtn) {
-  addToCartBtn.addEventListener('click', function(e) {
-    if (totalSelected() !== maxSelect) {
-      e.preventDefault();
-      return;
-    }
-    e.preventDefault();
-
-    addToCartBtn.disabled = true;
-    addToCartBtn.classList.add('loading');
-
-    // Prepare array of items for Shopify's /cart/add.js
-    const items = selections.map(sel => ({
-      id: sel.id,
-      quantity: sel.count
-    }));
-
-    fetch('/cart/add.js', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ items })
-    })
-    .then(res => res.json())
-    .then(() => {
-      resetSelections();
-      addToCartBtn.disabled = true;
-      addToCartBtn.classList.remove('loading');
-
-      // --- Refreshless cart drawer or notification update ---
-      const cartDrawer = document.querySelector("cart-drawer");
-      if (cartDrawer && typeof cartDrawer.open === "function") {
-        cartDrawer.open();
-        fetch("/?section_id=cart-drawer")
-          .then((res) => res.text())
-          .then((html) => {
-            const tempDiv = document.createElement("div");
-            tempDiv.innerHTML = html;
-            const newDrawer = tempDiv.querySelector("cart-drawer");
-            if (newDrawer) {
-              cartDrawer.innerHTML = newDrawer.innerHTML;
-              cartDrawer.classList.remove("is-empty");
-              const emptyMessage = cartDrawer.querySelector(".drawer__inner-empty");
-              if (emptyMessage) emptyMessage.style.display = "none";
-            }
-            fetch(window.location.href)
-              .then((res) => res.text())
-              .then((html) => {
-                const tempBubbleDiv = document.createElement("div");
-                tempBubbleDiv.innerHTML = html;
-                const newBubbleContent = tempBubbleDiv.querySelector("#cart-icon-bubble");
-                const currentBubble = document.querySelector("#cart-icon-bubble");
-                if (newBubbleContent && currentBubble) {
-                  currentBubble.innerHTML = newBubbleContent.innerHTML;
-                }
-              });
-          });
-        return;
-      }
-
-      const cartNotification = document.getElementById("cart-notification");
-      if (cartNotification) {
-        cartNotification.style.display = "block";
-        fetch("/?section_id=cart-notification")
-          .then((res) => res.text())
-          .then((html) => {
-            const tempDiv = document.createElement("div");
-            tempDiv.innerHTML = html;
-            const newNotif = tempDiv.querySelector("#cart-notification");
-            if (newNotif) {
-              cartNotification.innerHTML = newNotif.innerHTML;
-            }
-          });
-        return;
-      }
-    })
-    .catch(() => {
-      addToCartBtn.disabled = false;
-      addToCartBtn.classList.remove('loading');
-      alert('Error adding products to cart.');
-    });
-  });
-}
-
-  // --- Init ---
-  resetSelections();
-});
-</script>
-
 <product-info
   data-section="{{ section.id }}"
   data-product-id="{{ product.id }}"
@@ -315,6 +44,7 @@ if (addToCartBtn) {
   {%- endstyle -%}
 
   <script src="{{ 'product-info.js' | asset_url }}" defer="defer"></script>
+  <script src="{{ 'multi-variant-selector.js' | asset_url }}" defer="defer"></script>
   <script src="{{ 'show-more.js' | asset_url }}" defer="defer"></script>
   <script src="{{ 'price-per-item.js' | asset_url }}" defer="defer"></script>
 
@@ -395,7 +125,7 @@ if (addToCartBtn) {
                       {{ 'onboarding.product_title' | t }}
                     {%- endunless -%}
                   </h2>
-                  {%- when 'description' -%}
+                {%- when 'description' -%}
                   <div class="product__description" {{ block.shopify_attributes }}>
                     <p>{{ product.description }}</p>
                   </div>
@@ -446,149 +176,163 @@ if (addToCartBtn) {
                     <span class="visually-hidden">{{ 'products.product.sku' | t }}:</span>
                     {{- product.selected_or_first_available_variant.sku -}}
                   </p>
-                
+
                 {%- when 'share' -%}
                   {% liquid
                     assign share_url = product.selected_variant.url | default: product.url | prepend: request.origin
                     render 'share-button', block: block, share_link: share_url
                   %}
 
-                {%- comment -%}
-                  Variant image swatches (no default selection)
-                {%- endcomment -%}
-                  {%- when 'variant_selector' -%}
-                {%- comment -%} Swatch block, renders outside any form {%- endcomment -%}
-                <div class="buy-multi-toggle">
-                  <div class="buy-multi-wrapper">
-                  <button type="button" class="buy-multi-btn" data-max="1">
-                    <span class="buy-text">{{ block.settings.button1_text }}</span>
-                    <span class="buy-price">{{ block.settings.button1_price }}</span>
-                    {% if block.settings.button1_image %}
-                      <img src="{{ block.settings.button1_image | img_url: '100x' }}" alt="Button 1 Image" class="buy-img" />
-                    {% endif %}
-                  </button>
-                  <div class="shipping-badge badge--shipping">
-                    <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
-                    <path d="M0.416687 11.1041L0.833354 9.43748H5.41669L5.00002 11.1041H0.416687ZM5.83335 16.6666C5.13891 16.6666 4.54863 16.4236 4.06252 15.9375C3.57641 15.4514 3.33335 14.8611 3.33335 14.1666H1.25002L1.66669 12.3541H5.97919L6.72919 9.31248H8.47919L9.52085 5.14581H3.75002L3.87502 4.64581C3.95835 4.25692 4.14946 3.94109 4.44835 3.69831C4.74724 3.45554 5.0978 3.33387 5.50002 3.33331H15L14.2292 6.66665H16.6667L19.1667 9.99998L18.3334 14.1666H16.6667C16.6667 14.8611 16.4236 15.4514 15.9375 15.9375C15.4514 16.4236 14.8611 16.6666 14.1667 16.6666C13.4722 16.6666 12.882 16.4236 12.3959 15.9375C11.9097 15.4514 11.6667 14.8611 11.6667 14.1666H8.33335C8.33335 14.8611 8.0903 15.4514 7.60419 15.9375C7.11808 16.4236 6.5278 16.6666 5.83335 16.6666ZM2.08335 8.06248L2.50002 6.39581H7.91669L7.50002 8.06248H2.08335ZM5.83335 15C6.06946 15 6.26752 14.92 6.42752 14.76C6.58752 14.6 6.66724 14.4022 6.66669 14.1666C6.66613 13.9311 6.58613 13.7333 6.42669 13.5733C6.26724 13.4133 6.06946 13.3333 5.83335 13.3333C5.59724 13.3333 5.39946 13.4133 5.24002 13.5733C5.08058 13.7333 5.00058 13.9311 5.00002 14.1666C4.99946 14.4022 5.07946 14.6003 5.24002 14.7608C5.40058 14.9214 5.59835 15.0011 5.83335 15ZM14.1667 15C14.4028 15 14.6009 14.92 14.7609 14.76C14.9209 14.6 15.0006 14.4022 15 14.1666C14.9995 13.9311 14.9195 13.7333 14.76 13.5733C14.6006 13.4133 14.4028 13.3333 14.1667 13.3333C13.9306 13.3333 13.7328 13.4133 13.5734 13.5733C13.4139 13.7333 13.3339 13.9311 13.3334 14.1666C13.3328 14.4022 13.4128 14.6003 13.5734 14.7608C13.7339 14.9214 13.9317 15.0011 14.1667 15ZM13.2709 10.8333H17.2917L17.375 10.3958L15.8334 8.33331H13.8542L13.2709 10.8333Z" fill="white"/>
-                    </svg>
-                    <span>Shipping</span>
-                  </div>
+                  {%- comment -%}
+                    Variant image swatches (no default selection)
+                  {%- endcomment -%}
+                {%- when 'variant_selector' -%}
+                  {%- comment -%} Swatch block, renders outside any form {%- endcomment -%}
+                  <div class="buy-multi-toggle">
+                    <div class="buy-multi-wrapper">
+                      <button type="button" class="buy-multi-btn" data-max="1">
+                        <span class="buy-text">{{ block.settings.button1_text }}</span>
+                        <span class="buy-price">{{ block.settings.button1_price }}</span>
+                        {% if block.settings.button1_image %}
+                          <img
+                            src="{{ block.settings.button1_image | img_url: '100x' }}"
+                            alt="Button 1 Image"
+                            class="buy-img"
+                          >
+                        {% endif %}
+                      </button>
+                      <div class="shipping-badge badge--shipping">
+                        <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+                          <path d="M0.416687 11.1041L0.833354 9.43748H5.41669L5.00002 11.1041H0.416687ZM5.83335 16.6666C5.13891 16.6666 4.54863 16.4236 4.06252 15.9375C3.57641 15.4514 3.33335 14.8611 3.33335 14.1666H1.25002L1.66669 12.3541H5.97919L6.72919 9.31248H8.47919L9.52085 5.14581H3.75002L3.87502 4.64581C3.95835 4.25692 4.14946 3.94109 4.44835 3.69831C4.74724 3.45554 5.0978 3.33387 5.50002 3.33331H15L14.2292 6.66665H16.6667L19.1667 9.99998L18.3334 14.1666H16.6667C16.6667 14.8611 16.4236 15.4514 15.9375 15.9375C15.4514 16.4236 14.8611 16.6666 14.1667 16.6666C13.4722 16.6666 12.882 16.4236 12.3959 15.9375C11.9097 15.4514 11.6667 14.8611 11.6667 14.1666H8.33335C8.33335 14.8611 8.0903 15.4514 7.60419 15.9375C7.11808 16.4236 6.5278 16.6666 5.83335 16.6666ZM2.08335 8.06248L2.50002 6.39581H7.91669L7.50002 8.06248H2.08335ZM5.83335 15C6.06946 15 6.26752 14.92 6.42752 14.76C6.58752 14.6 6.66724 14.4022 6.66669 14.1666C6.66613 13.9311 6.58613 13.7333 6.42669 13.5733C6.26724 13.4133 6.06946 13.3333 5.83335 13.3333C5.59724 13.3333 5.39946 13.4133 5.24002 13.5733C5.08058 13.7333 5.00058 13.9311 5.00002 14.1666C4.99946 14.4022 5.07946 14.6003 5.24002 14.7608C5.40058 14.9214 5.59835 15.0011 5.83335 15ZM14.1667 15C14.4028 15 14.6009 14.92 14.7609 14.76C14.9209 14.6 15.0006 14.4022 15 14.1666C14.9995 13.9311 14.9195 13.7333 14.76 13.5733C14.6006 13.4133 14.4028 13.3333 14.1667 13.3333C13.9306 13.3333 13.7328 13.4133 13.5734 13.5733C13.4139 13.7333 13.3339 13.9311 13.3334 14.1666C13.3328 14.4022 13.4128 14.6003 13.5734 14.7608C13.7339 14.9214 13.9317 15.0011 14.1667 15ZM13.2709 10.8333H17.2917L17.375 10.3958L15.8334 8.33331H13.8542L13.2709 10.8333Z" fill="white"/>
+                        </svg>
+                        <span>Shipping</span>
+                      </div>
+                    </div>
+
+                    <div class="buy-multi-wrapper">
+                      <div class="badge badge--popular">
+                        <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+                          <path d="M10.0001 13.9587C9.66681 13.9587 9.33348 13.9337 9.01681 13.8753C7.25014 13.617 5.64181 12.6003 4.62514 11.092C3.91681 10.0253 3.54181 8.78366 3.54181 7.50033C3.54181 3.94199 6.44181 1.04199 10.0001 1.04199C13.5585 1.04199 16.4585 3.94199 16.4585 7.50033C16.4585 8.78366 16.0835 10.0253 15.3751 11.092C14.3501 12.6087 12.7418 13.617 10.9585 13.8837C10.6668 13.9337 10.3335 13.9587 10.0001 13.9587ZM10.0001 2.29199C7.12514 2.29199 4.79181 4.62533 4.79181 7.50033C4.79181 8.542 5.09181 9.542 5.65848 10.392C6.48348 11.6087 7.77514 12.4253 9.20848 12.6337C9.74181 12.7253 10.2668 12.7253 10.7585 12.6337C12.2168 12.4253 13.5085 11.6003 14.3335 10.3837C14.9001 9.53366 15.2001 8.53365 15.2001 7.49199C15.2085 4.62532 12.8751 2.29199 10.0001 2.29199Z" fill="white"></path>
+                          <path d="M5.3916 18.8246C5.27493 18.8246 5.1666 18.808 5.04993 18.783C4.50826 18.658 4.0916 18.2413 3.9666 17.6996L3.67493 16.4746C3.65826 16.3996 3.59993 16.3413 3.5166 16.3163L2.1416 15.9913C1.62493 15.8663 1.2166 15.483 1.07493 14.9746C0.933263 14.4663 1.07493 13.9163 1.44993 13.5413L4.69993 10.2913C4.83326 10.158 5.0166 10.0913 5.19993 10.108C5.38326 10.1247 5.54993 10.2246 5.65826 10.383C6.48326 11.5996 7.77493 12.4247 9.2166 12.633C9.74993 12.7247 10.2749 12.7247 10.7666 12.633C12.2249 12.4247 13.5166 11.5996 14.3416 10.383C14.4416 10.2246 14.6166 10.1247 14.7999 10.108C14.9833 10.0913 15.1666 10.158 15.2999 10.2913L18.5499 13.5413C18.9249 13.9163 19.0666 14.4663 18.9249 14.9746C18.7833 15.483 18.3666 15.8747 17.8583 15.9913L16.4833 16.3163C16.4083 16.333 16.3499 16.3913 16.3249 16.4746L16.0333 17.6996C15.9083 18.2413 15.4916 18.658 14.9499 18.783C14.4083 18.9163 13.8499 18.7246 13.4999 18.2996L9.99993 14.2747L6.49993 18.308C6.2166 18.6413 5.8166 18.8246 5.3916 18.8246ZM5.07493 11.6913L2.33326 14.433C2.25826 14.508 2.2666 14.5913 2.28326 14.6413C2.2916 14.683 2.33326 14.7663 2.43326 14.783L3.80826 15.108C4.34993 15.233 4.7666 15.6496 4.8916 16.1913L5.18326 17.4163C5.20826 17.5246 5.2916 17.558 5.3416 17.5746C5.3916 17.583 5.47493 17.5913 5.54993 17.508L8.74159 13.833C7.32493 13.558 6.02493 12.7996 5.07493 11.6913ZM11.2583 13.8246L14.4499 17.4913C14.5249 17.583 14.6166 17.583 14.6666 17.5663C14.7166 17.558 14.7916 17.5163 14.8249 17.408L15.1166 16.183C15.2416 15.6413 15.6583 15.2246 16.1999 15.0996L17.5749 14.7747C17.6749 14.7497 17.7166 14.6746 17.7249 14.633C17.7416 14.5913 17.7499 14.4996 17.6749 14.4246L14.9333 11.683C13.9749 12.7913 12.6833 13.5496 11.2583 13.8246Z" fill="white"></path>
+                          <path d="M11.5751 10.7414C11.3584 10.7414 11.1001 10.6831 10.7918 10.4997L10.0001 10.0247L9.20843 10.4914C8.48343 10.9247 8.00843 10.6747 7.83343 10.5497C7.65843 10.4247 7.28343 10.0497 7.4751 9.22472L7.6751 8.36639L7.00843 7.7497C6.64176 7.38304 6.50843 6.94139 6.63343 6.54139C6.75843 6.14139 7.1251 5.85804 7.64176 5.77471L8.53343 5.62472L8.95843 4.69139C9.2001 4.21639 9.5751 3.94971 10.0001 3.94971C10.4251 3.94971 10.8084 4.22473 11.0418 4.69973L11.5334 5.68305L12.3584 5.78305C12.8668 5.86638 13.2334 6.1497 13.3668 6.5497C13.4918 6.9497 13.3584 7.39138 12.9918 7.75805L12.3001 8.44973L12.5168 9.22472C12.7084 10.0497 12.3334 10.4247 12.1584 10.5497C12.0668 10.6247 11.8668 10.7414 11.5751 10.7414ZM8.00843 6.99139L8.58343 7.56637C8.8501 7.83304 8.98343 8.28305 8.9001 8.64972L8.74176 9.31638L9.40843 8.92471C9.76676 8.71637 10.2501 8.71637 10.6001 8.92471L11.2668 9.31638L11.1168 8.64972C11.0334 8.27472 11.1584 7.83304 11.4251 7.56637L12.0001 6.99139L11.2751 6.86637C10.9251 6.80804 10.5751 6.54972 10.4168 6.23306L10.0001 5.41638L9.58343 6.24972C9.43343 6.55805 9.08343 6.82472 8.73343 6.88306L8.00843 6.99139Z" fill="white"></path>
+                        </svg>
+                        <span>Most Popular</span>
+                      </div>
+                      <button type="button" class="buy-multi-btn active" data-max="3">
+                        <span class="buy-text">{{ block.settings.button2_text }}</span>
+                        <span class="buy-price">{{ block.settings.button2_price }}</span>
+                        {% if block.settings.button2_image %}
+                          <img
+                            src="{{ block.settings.button2_image | img_url: '100x' }}"
+                            alt="Button 2 Image"
+                            class="buy-img"
+                          >
+                        {% endif %}
+                      </button>
+                      <div class="shipping-badge badge--free-shipping">
+                        <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+                          <path d="M0.416687 11.1041L0.833354 9.43748H5.41669L5.00002 11.1041H0.416687ZM5.83335 16.6666C5.13891 16.6666 4.54863 16.4236 4.06252 15.9375C3.57641 15.4514 3.33335 14.8611 3.33335 14.1666H1.25002L1.66669 12.3541H5.97919L6.72919 9.31248H8.47919L9.52085 5.14581H3.75002L3.87502 4.64581C3.95835 4.25692 4.14946 3.94109 4.44835 3.69831C4.74724 3.45554 5.0978 3.33387 5.50002 3.33331H15L14.2292 6.66665H16.6667L19.1667 9.99998L18.3334 14.1666H16.6667C16.6667 14.8611 16.4236 15.4514 15.9375 15.9375C15.4514 16.4236 14.8611 16.6666 14.1667 16.6666C13.4722 16.6666 12.882 16.4236 12.3959 15.9375C11.9097 15.4514 11.6667 14.8611 11.6667 14.1666H8.33335C8.33335 14.8611 8.0903 15.4514 7.60419 15.9375C7.11808 16.4236 6.5278 16.6666 5.83335 16.6666ZM2.08335 8.06248L2.50002 6.39581H7.91669L7.50002 8.06248H2.08335ZM5.83335 15C6.06946 15 6.26752 14.92 6.42752 14.76C6.58752 14.6 6.66724 14.4022 6.66669 14.1666C6.66613 13.9311 6.58613 13.7333 6.42669 13.5733C6.26724 13.4133 6.06946 13.3333 5.83335 13.3333C5.59724 13.3333 5.39946 13.4133 5.24002 13.5733C5.08058 13.7333 5.00058 13.9311 5.00002 14.1666C4.99946 14.4022 5.07946 14.6003 5.24002 14.7608C5.40058 14.9214 5.59835 15.0011 5.83335 15ZM14.1667 15C14.4028 15 14.6009 14.92 14.7609 14.76C14.9209 14.6 15.0006 14.4022 15 14.1666C14.9995 13.9311 14.9195 13.7333 14.76 13.5733C14.6006 13.4133 14.4028 13.3333 14.1667 13.3333C13.9306 13.3333 13.7328 13.4133 13.5734 13.5733C13.4139 13.7333 13.3339 13.9311 13.3334 14.1666C13.3328 14.4022 13.4128 14.6003 13.5734 14.7608C13.7339 14.9214 13.9317 15.0011 14.1667 15ZM13.2709 10.8333H17.2917L17.375 10.3958L15.8334 8.33331H13.8542L13.2709 10.8333Z" fill="#065F46"/>
+                        </svg>
+                        <span>FREE Shipping</span>
+                      </div>
+                    </div>
+
+                    <div class="buy-multi-wrapper">
+                      <div class="badge badge--bestseller">
+                        <svg width="21" height="20" viewBox="0 0 21 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+                          <path d="M9.49163 12.6416C9.32497 12.6416 9.16663 12.5749 9.04997 12.4582L7.0333 10.4416C6.79163 10.1999 6.79163 9.7999 7.0333 9.55824C7.27497 9.31657 7.67497 9.31657 7.91663 9.55824L9.49163 11.1332L13.075 7.5499C13.3166 7.30824 13.7166 7.30824 13.9583 7.5499C14.2 7.79157 14.2 8.19157 13.9583 8.43324L9.9333 12.4582C9.81663 12.5749 9.6583 12.6416 9.49163 12.6416Z" fill="white"></path>
+                          <path d="M10.4999 18.9582C9.97494 18.9582 9.44994 18.7832 9.04161 18.4332L7.72494 17.2998C7.59161 17.1832 7.25828 17.0665 7.08328 17.0665H5.64994C4.41661 17.0665 3.41661 16.0665 3.41661 14.8332V13.4082C3.41661 13.2332 3.29994 12.9082 3.18328 12.7748L2.05828 11.4498C1.37494 10.6415 1.37494 9.3665 2.05828 8.55817L3.18328 7.23317C3.29994 7.09984 3.41661 6.77484 3.41661 6.59984V5.1665C3.41661 3.93317 4.41661 2.93317 5.64994 2.93317H7.09161C7.26661 2.93317 7.59994 2.80817 7.73328 2.69984L9.04994 1.5665C9.86661 0.866504 11.1416 0.866504 11.9583 1.5665L13.2749 2.69984C13.4083 2.8165 13.7416 2.93317 13.9166 2.93317H15.3333C16.5666 2.93317 17.5666 3.93317 17.5666 5.1665V6.58317C17.5666 6.75817 17.6916 7.0915 17.8083 7.22484L18.9416 8.5415C19.6416 9.35817 19.6416 10.6332 18.9416 11.4498L17.8083 12.7665C17.6916 12.8998 17.5666 13.2332 17.5666 13.4082V14.8248C17.5666 16.0582 16.5666 17.0582 15.3333 17.0582H13.9166C13.7416 17.0582 13.4083 17.1832 13.2749 17.2915L11.9583 18.4248C11.5499 18.7832 11.0249 18.9582 10.4999 18.9582ZM5.64994 4.18317C5.10828 4.18317 4.66661 4.62484 4.66661 5.1665V6.5915C4.66661 7.0665 4.44161 7.67484 4.13328 8.03317L3.00828 9.35817C2.71661 9.69984 2.71661 10.2915 3.00828 10.6332L4.13328 11.9582C4.44161 12.3248 4.66661 12.9248 4.66661 13.3998V14.8248C4.66661 15.3665 5.10828 15.8082 5.64994 15.8082H7.09161C7.57494 15.8082 8.18328 16.0332 8.54994 16.3498L9.86661 17.4832C10.2083 17.7748 10.8083 17.7748 11.1499 17.4832L12.4666 16.3498C12.8333 16.0415 13.4416 15.8082 13.9249 15.8082H15.3416C15.8833 15.8082 16.3249 15.3665 16.3249 14.8248V13.4082C16.3249 12.9248 16.5499 12.3165 16.8666 11.9498L17.9999 10.6332C18.2916 10.2915 18.2916 9.6915 17.9999 9.34984L16.8666 8.03317C16.5499 7.6665 16.3249 7.05817 16.3249 6.57484V5.1665C16.3249 4.62484 15.8833 4.18317 15.3416 4.18317H13.9249C13.4416 4.18317 12.8333 3.95817 12.4666 3.6415L11.1499 2.50817C10.8083 2.2165 10.2083 2.2165 9.86661 2.50817L8.54994 3.64984C8.18328 3.95817 7.56661 4.18317 7.09161 4.18317H5.64994Z" fill="white"></path>
+                        </svg>
+                        <span>Best Seller</span>
+                      </div>
+                      <button type="button" class="buy-multi-btn last-child-multi-btn" data-max="5">
+                        <span class="buy-text">{{ block.settings.button3_text }}</span>
+                        <span class="buy-price">{{ block.settings.button3_price }}</span>
+                        {% if block.settings.button3_image %}
+                          <img
+                            src="{{ block.settings.button3_image | img_url: '100x' }}"
+                            alt="Button 3 Image"
+                            class="buy-img"
+                          >
+                        {% endif %}
+                      </button>
+                      <div class="shipping-badge badge--free-shipping">
+                        <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+                          <path d="M0.416687 11.1041L0.833354 9.43748H5.41669L5.00002 11.1041H0.416687ZM5.83335 16.6666C5.13891 16.6666 4.54863 16.4236 4.06252 15.9375C3.57641 15.4514 3.33335 14.8611 3.33335 14.1666H1.25002L1.66669 12.3541H5.97919L6.72919 9.31248H8.47919L9.52085 5.14581H3.75002L3.87502 4.64581C3.95835 4.25692 4.14946 3.94109 4.44835 3.69831C4.74724 3.45554 5.0978 3.33387 5.50002 3.33331H15L14.2292 6.66665H16.6667L19.1667 9.99998L18.3334 14.1666H16.6667C16.6667 14.8611 16.4236 15.4514 15.9375 15.9375C15.4514 16.4236 14.8611 16.6666 14.1667 16.6666C13.4722 16.6666 12.882 16.4236 12.3959 15.9375C11.9097 15.4514 11.6667 14.8611 11.6667 14.1666H8.33335C8.33335 14.8611 8.0903 15.4514 7.60419 15.9375C7.11808 16.4236 6.5278 16.6666 5.83335 16.6666ZM2.08335 8.06248L2.50002 6.39581H7.91669L7.50002 8.06248H2.08335ZM5.83335 15C6.06946 15 6.26752 14.92 6.42752 14.76C6.58752 14.6 6.66724 14.4022 6.66669 14.1666C6.66613 13.9311 6.58613 13.7333 6.42669 13.5733C6.26724 13.4133 6.06946 13.3333 5.83335 13.3333C5.59724 13.3333 5.39946 13.4133 5.24002 13.5733C5.08058 13.7333 5.00058 13.9311 5.00002 14.1666C4.99946 14.4022 5.07946 14.6003 5.24002 14.7608C5.40058 14.9214 5.59835 15.0011 5.83335 15ZM14.1667 15C14.4028 15 14.6009 14.92 14.7609 14.76C14.9209 14.6 15.0006 14.4022 15 14.1666C14.9995 13.9311 14.9195 13.7333 14.76 13.5733C14.6006 13.4133 14.4028 13.3333 14.1667 13.3333C13.9306 13.3333 13.7328 13.4133 13.5734 13.5733C13.4139 13.7333 13.3339 13.9311 13.3334 14.1666C13.3328 14.4022 13.4128 14.6003 13.5734 14.7608C13.7339 14.9214 13.9317 15.0011 14.1667 15ZM13.2709 10.8333H17.2917L17.375 10.3958L15.8334 8.33331H13.8542L13.2709 10.8333Z" fill="#065F46"/>
+                        </svg>
+                        <span>FREE Shipping</span>
+                      </div>
+                    </div>
                   </div>
 
-                  <div class="buy-multi-wrapper">
-                  <div class="badge badge--popular">
-                    <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
-                      <path d="M10.0001 13.9587C9.66681 13.9587 9.33348 13.9337 9.01681 13.8753C7.25014 13.617 5.64181 12.6003 4.62514 11.092C3.91681 10.0253 3.54181 8.78366 3.54181 7.50033C3.54181 3.94199 6.44181 1.04199 10.0001 1.04199C13.5585 1.04199 16.4585 3.94199 16.4585 7.50033C16.4585 8.78366 16.0835 10.0253 15.3751 11.092C14.3501 12.6087 12.7418 13.617 10.9585 13.8837C10.6668 13.9337 10.3335 13.9587 10.0001 13.9587ZM10.0001 2.29199C7.12514 2.29199 4.79181 4.62533 4.79181 7.50033C4.79181 8.542 5.09181 9.542 5.65848 10.392C6.48348 11.6087 7.77514 12.4253 9.20848 12.6337C9.74181 12.7253 10.2668 12.7253 10.7585 12.6337C12.2168 12.4253 13.5085 11.6003 14.3335 10.3837C14.9001 9.53366 15.2001 8.53365 15.2001 7.49199C15.2085 4.62532 12.8751 2.29199 10.0001 2.29199Z" fill="white"></path>
-                      <path d="M5.3916 18.8246C5.27493 18.8246 5.1666 18.808 5.04993 18.783C4.50826 18.658 4.0916 18.2413 3.9666 17.6996L3.67493 16.4746C3.65826 16.3996 3.59993 16.3413 3.5166 16.3163L2.1416 15.9913C1.62493 15.8663 1.2166 15.483 1.07493 14.9746C0.933263 14.4663 1.07493 13.9163 1.44993 13.5413L4.69993 10.2913C4.83326 10.158 5.0166 10.0913 5.19993 10.108C5.38326 10.1247 5.54993 10.2246 5.65826 10.383C6.48326 11.5996 7.77493 12.4247 9.2166 12.633C9.74993 12.7247 10.2749 12.7247 10.7666 12.633C12.2249 12.4247 13.5166 11.5996 14.3416 10.383C14.4416 10.2246 14.6166 10.1247 14.7999 10.108C14.9833 10.0913 15.1666 10.158 15.2999 10.2913L18.5499 13.5413C18.9249 13.9163 19.0666 14.4663 18.9249 14.9746C18.7833 15.483 18.3666 15.8747 17.8583 15.9913L16.4833 16.3163C16.4083 16.333 16.3499 16.3913 16.3249 16.4746L16.0333 17.6996C15.9083 18.2413 15.4916 18.658 14.9499 18.783C14.4083 18.9163 13.8499 18.7246 13.4999 18.2996L9.99993 14.2747L6.49993 18.308C6.2166 18.6413 5.8166 18.8246 5.3916 18.8246ZM5.07493 11.6913L2.33326 14.433C2.25826 14.508 2.2666 14.5913 2.28326 14.6413C2.2916 14.683 2.33326 14.7663 2.43326 14.783L3.80826 15.108C4.34993 15.233 4.7666 15.6496 4.8916 16.1913L5.18326 17.4163C5.20826 17.5246 5.2916 17.558 5.3416 17.5746C5.3916 17.583 5.47493 17.5913 5.54993 17.508L8.74159 13.833C7.32493 13.558 6.02493 12.7996 5.07493 11.6913ZM11.2583 13.8246L14.4499 17.4913C14.5249 17.583 14.6166 17.583 14.6666 17.5663C14.7166 17.558 14.7916 17.5163 14.8249 17.408L15.1166 16.183C15.2416 15.6413 15.6583 15.2246 16.1999 15.0996L17.5749 14.7747C17.6749 14.7497 17.7166 14.6746 17.7249 14.633C17.7416 14.5913 17.7499 14.4996 17.6749 14.4246L14.9333 11.683C13.9749 12.7913 12.6833 13.5496 11.2583 13.8246Z" fill="white"></path>
-                      <path d="M11.5751 10.7414C11.3584 10.7414 11.1001 10.6831 10.7918 10.4997L10.0001 10.0247L9.20843 10.4914C8.48343 10.9247 8.00843 10.6747 7.83343 10.5497C7.65843 10.4247 7.28343 10.0497 7.4751 9.22472L7.6751 8.36639L7.00843 7.7497C6.64176 7.38304 6.50843 6.94139 6.63343 6.54139C6.75843 6.14139 7.1251 5.85804 7.64176 5.77471L8.53343 5.62472L8.95843 4.69139C9.2001 4.21639 9.5751 3.94971 10.0001 3.94971C10.4251 3.94971 10.8084 4.22473 11.0418 4.69973L11.5334 5.68305L12.3584 5.78305C12.8668 5.86638 13.2334 6.1497 13.3668 6.5497C13.4918 6.9497 13.3584 7.39138 12.9918 7.75805L12.3001 8.44973L12.5168 9.22472C12.7084 10.0497 12.3334 10.4247 12.1584 10.5497C12.0668 10.6247 11.8668 10.7414 11.5751 10.7414ZM8.00843 6.99139L8.58343 7.56637C8.8501 7.83304 8.98343 8.28305 8.9001 8.64972L8.74176 9.31638L9.40843 8.92471C9.76676 8.71637 10.2501 8.71637 10.6001 8.92471L11.2668 9.31638L11.1168 8.64972C11.0334 8.27472 11.1584 7.83304 11.4251 7.56637L12.0001 6.99139L11.2751 6.86637C10.9251 6.80804 10.5751 6.54972 10.4168 6.23306L10.0001 5.41638L9.58343 6.24972C9.43343 6.55805 9.08343 6.82472 8.73343 6.88306L8.00843 6.99139Z" fill="white"></path>
-                    </svg>
-                    <span>Most Popular</span>
+                  <div class="choose_color-info-container">
+                    <p>Choose your color</p>
+                    <div class="choose_color-info">
+                      <span class="multi-buy-per-item"></span>
+                      <span class="multi-buy-save"></span>
+                    </div>
                   </div>
-                  <button type="button" class="buy-multi-btn active" data-max="3">
-                    <span class="buy-text">{{ block.settings.button2_text }}</span>
-                    <span class="buy-price">{{ block.settings.button2_price }}</span>
-                    {% if block.settings.button2_image %}
-                      <img src="{{ block.settings.button2_image | img_url: '100x' }}" alt="Button 2 Image" class="buy-img" />
-                    {% endif %}
-                  </button>
-                  <div class="shipping-badge badge--free-shipping">
-                    <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
-                    <path d="M0.416687 11.1041L0.833354 9.43748H5.41669L5.00002 11.1041H0.416687ZM5.83335 16.6666C5.13891 16.6666 4.54863 16.4236 4.06252 15.9375C3.57641 15.4514 3.33335 14.8611 3.33335 14.1666H1.25002L1.66669 12.3541H5.97919L6.72919 9.31248H8.47919L9.52085 5.14581H3.75002L3.87502 4.64581C3.95835 4.25692 4.14946 3.94109 4.44835 3.69831C4.74724 3.45554 5.0978 3.33387 5.50002 3.33331H15L14.2292 6.66665H16.6667L19.1667 9.99998L18.3334 14.1666H16.6667C16.6667 14.8611 16.4236 15.4514 15.9375 15.9375C15.4514 16.4236 14.8611 16.6666 14.1667 16.6666C13.4722 16.6666 12.882 16.4236 12.3959 15.9375C11.9097 15.4514 11.6667 14.8611 11.6667 14.1666H8.33335C8.33335 14.8611 8.0903 15.4514 7.60419 15.9375C7.11808 16.4236 6.5278 16.6666 5.83335 16.6666ZM2.08335 8.06248L2.50002 6.39581H7.91669L7.50002 8.06248H2.08335ZM5.83335 15C6.06946 15 6.26752 14.92 6.42752 14.76C6.58752 14.6 6.66724 14.4022 6.66669 14.1666C6.66613 13.9311 6.58613 13.7333 6.42669 13.5733C6.26724 13.4133 6.06946 13.3333 5.83335 13.3333C5.59724 13.3333 5.39946 13.4133 5.24002 13.5733C5.08058 13.7333 5.00058 13.9311 5.00002 14.1666C4.99946 14.4022 5.07946 14.6003 5.24002 14.7608C5.40058 14.9214 5.59835 15.0011 5.83335 15ZM14.1667 15C14.4028 15 14.6009 14.92 14.7609 14.76C14.9209 14.6 15.0006 14.4022 15 14.1666C14.9995 13.9311 14.9195 13.7333 14.76 13.5733C14.6006 13.4133 14.4028 13.3333 14.1667 13.3333C13.9306 13.3333 13.7328 13.4133 13.5734 13.5733C13.4139 13.7333 13.3339 13.9311 13.3334 14.1666C13.3328 14.4022 13.4128 14.6003 13.5734 14.7608C13.7339 14.9214 13.9317 15.0011 14.1667 15ZM13.2709 10.8333H17.2917L17.375 10.3958L15.8334 8.33331H13.8542L13.2709 10.8333Z" fill="#065F46"/>
-                    </svg>
-                    <span>FREE Shipping</span>
+                  <div class="variant-swatches" id="variantSwatchContainer">
+                    {% for variant in product.variants %}
+                      <button
+                        type="button"
+                        class="variant-swatch"
+                        data-variant-id="{{ variant.id }}"
+                        aria-label="{{ variant.title }}"
+                        {% unless variant.available %}
+                          disabled
+                        {% endunless %}
+                      >
+                        {% if variant.featured_image %}
+                          <img src="{{ variant.featured_image | image_url: width: 60 }}" alt="{{ variant.title }}">
+                        {% else %}
+                          <span class="swatch-placeholder"></span>
+                        {% endif %}
+                        <span class="swatch-qty-overlay"></span>
+                      </button>
+                    {% endfor %}
                   </div>
-                  </div>
-
-                  <div class="buy-multi-wrapper">
-                  <div class="badge badge--bestseller">
-                    <svg width="21" height="20" viewBox="0 0 21 20" fill="none" xmlns="http://www.w3.org/2000/svg">
-                      <path d="M9.49163 12.6416C9.32497 12.6416 9.16663 12.5749 9.04997 12.4582L7.0333 10.4416C6.79163 10.1999 6.79163 9.7999 7.0333 9.55824C7.27497 9.31657 7.67497 9.31657 7.91663 9.55824L9.49163 11.1332L13.075 7.5499C13.3166 7.30824 13.7166 7.30824 13.9583 7.5499C14.2 7.79157 14.2 8.19157 13.9583 8.43324L9.9333 12.4582C9.81663 12.5749 9.6583 12.6416 9.49163 12.6416Z" fill="white"></path>
-                      <path d="M10.4999 18.9582C9.97494 18.9582 9.44994 18.7832 9.04161 18.4332L7.72494 17.2998C7.59161 17.1832 7.25828 17.0665 7.08328 17.0665H5.64994C4.41661 17.0665 3.41661 16.0665 3.41661 14.8332V13.4082C3.41661 13.2332 3.29994 12.9082 3.18328 12.7748L2.05828 11.4498C1.37494 10.6415 1.37494 9.3665 2.05828 8.55817L3.18328 7.23317C3.29994 7.09984 3.41661 6.77484 3.41661 6.59984V5.1665C3.41661 3.93317 4.41661 2.93317 5.64994 2.93317H7.09161C7.26661 2.93317 7.59994 2.80817 7.73328 2.69984L9.04994 1.5665C9.86661 0.866504 11.1416 0.866504 11.9583 1.5665L13.2749 2.69984C13.4083 2.8165 13.7416 2.93317 13.9166 2.93317H15.3333C16.5666 2.93317 17.5666 3.93317 17.5666 5.1665V6.58317C17.5666 6.75817 17.6916 7.0915 17.8083 7.22484L18.9416 8.5415C19.6416 9.35817 19.6416 10.6332 18.9416 11.4498L17.8083 12.7665C17.6916 12.8998 17.5666 13.2332 17.5666 13.4082V14.8248C17.5666 16.0582 16.5666 17.0582 15.3333 17.0582H13.9166C13.7416 17.0582 13.4083 17.1832 13.2749 17.2915L11.9583 18.4248C11.5499 18.7832 11.0249 18.9582 10.4999 18.9582ZM5.64994 4.18317C5.10828 4.18317 4.66661 4.62484 4.66661 5.1665V6.5915C4.66661 7.0665 4.44161 7.67484 4.13328 8.03317L3.00828 9.35817C2.71661 9.69984 2.71661 10.2915 3.00828 10.6332L4.13328 11.9582C4.44161 12.3248 4.66661 12.9248 4.66661 13.3998V14.8248C4.66661 15.3665 5.10828 15.8082 5.64994 15.8082H7.09161C7.57494 15.8082 8.18328 16.0332 8.54994 16.3498L9.86661 17.4832C10.2083 17.7748 10.8083 17.7748 11.1499 17.4832L12.4666 16.3498C12.8333 16.0415 13.4416 15.8082 13.9249 15.8082H15.3416C15.8833 15.8082 16.3249 15.3665 16.3249 14.8248V13.4082C16.3249 12.9248 16.5499 12.3165 16.8666 11.9498L17.9999 10.6332C18.2916 10.2915 18.2916 9.6915 17.9999 9.34984L16.8666 8.03317C16.5499 7.6665 16.3249 7.05817 16.3249 6.57484V5.1665C16.3249 4.62484 15.8833 4.18317 15.3416 4.18317H13.9249C13.4416 4.18317 12.8333 3.95817 12.4666 3.6415L11.1499 2.50817C10.8083 2.2165 10.2083 2.2165 9.86661 2.50817L8.54994 3.64984C8.18328 3.95817 7.56661 4.18317 7.09161 4.18317H5.64994Z" fill="white"></path>
-                    </svg>
-                    <span>Best Seller</span>
-                  </div>
-                  <button type="button" class="buy-multi-btn last-child-multi-btn" data-max="5">
-                    <span class="buy-text">{{ block.settings.button3_text }}</span>
-                    <span class="buy-price">{{ block.settings.button3_price }}</span>
-                    {% if block.settings.button3_image %}
-                      <img src="{{ block.settings.button3_image | img_url: '100x' }}" alt="Button 3 Image" class="buy-img" />
-                    {% endif %}
-                  </button>
-                  <div class="shipping-badge badge--free-shipping">
-                    <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
-                    <path d="M0.416687 11.1041L0.833354 9.43748H5.41669L5.00002 11.1041H0.416687ZM5.83335 16.6666C5.13891 16.6666 4.54863 16.4236 4.06252 15.9375C3.57641 15.4514 3.33335 14.8611 3.33335 14.1666H1.25002L1.66669 12.3541H5.97919L6.72919 9.31248H8.47919L9.52085 5.14581H3.75002L3.87502 4.64581C3.95835 4.25692 4.14946 3.94109 4.44835 3.69831C4.74724 3.45554 5.0978 3.33387 5.50002 3.33331H15L14.2292 6.66665H16.6667L19.1667 9.99998L18.3334 14.1666H16.6667C16.6667 14.8611 16.4236 15.4514 15.9375 15.9375C15.4514 16.4236 14.8611 16.6666 14.1667 16.6666C13.4722 16.6666 12.882 16.4236 12.3959 15.9375C11.9097 15.4514 11.6667 14.8611 11.6667 14.1666H8.33335C8.33335 14.8611 8.0903 15.4514 7.60419 15.9375C7.11808 16.4236 6.5278 16.6666 5.83335 16.6666ZM2.08335 8.06248L2.50002 6.39581H7.91669L7.50002 8.06248H2.08335ZM5.83335 15C6.06946 15 6.26752 14.92 6.42752 14.76C6.58752 14.6 6.66724 14.4022 6.66669 14.1666C6.66613 13.9311 6.58613 13.7333 6.42669 13.5733C6.26724 13.4133 6.06946 13.3333 5.83335 13.3333C5.59724 13.3333 5.39946 13.4133 5.24002 13.5733C5.08058 13.7333 5.00058 13.9311 5.00002 14.1666C4.99946 14.4022 5.07946 14.6003 5.24002 14.7608C5.40058 14.9214 5.59835 15.0011 5.83335 15ZM14.1667 15C14.4028 15 14.6009 14.92 14.7609 14.76C14.9209 14.6 15.0006 14.4022 15 14.1666C14.9995 13.9311 14.9195 13.7333 14.76 13.5733C14.6006 13.4133 14.4028 13.3333 14.1667 13.3333C13.9306 13.3333 13.7328 13.4133 13.5734 13.5733C13.4139 13.7333 13.3339 13.9311 13.3334 14.1666C13.3328 14.4022 13.4128 14.6003 13.5734 14.7608C13.7339 14.9214 13.9317 15.0011 14.1667 15ZM13.2709 10.8333H17.2917L17.375 10.3958L15.8334 8.33331H13.8542L13.2709 10.8333Z" fill="#065F46"/>
-                    </svg>
-                    <span>FREE Shipping</span>
-                  </div>
-                  </div>
-                </div>
-
-                <div class="choose_color-info-container">
-                  <p>Choose your color</p>
-                  <div class="choose_color-info">
-                  <span class="multi-buy-per-item"></span>
-                  <span class="multi-buy-save"></span>
-                  </div>
-                </div>
-                <div class="variant-swatches" id="variantSwatchContainer">
-                  {% for variant in product.variants %}
-                    <button
-                      type="button"
-                      class="variant-swatch"
-                      data-variant-id="{{ variant.id }}"
-                      aria-label="{{ variant.title }}"
-                      {% unless variant.available %}disabled{% endunless %}
-                    >
-                      {% if variant.featured_image %}
-                        <img src="{{ variant.featured_image | image_url: width: 60 }}" alt="{{ variant.title }}" />
-                      {% else %}
-                        <span class="swatch-placeholder"></span>
-                      {% endif %}
-                      <span class="swatch-qty-overlay"></span>
-                    </button>
-                  {% endfor %}
-                </div>
-                <div class="selected-colors-summary">Selected Colors:<span class="selected-colors-text"></span></div>
+                  <div class="selected-colors-summary">Selected Colors:<span class="selected-colors-text"></span></div>
 
                 {%- when 'buy_buttons' -%}
-                {%- render 'buy-buttons',
-                  block: block,
-                  product: product,
-                  product_form_id: product_form_id,
-                  section_id: section.id,
-                  show_multi_price: true
-                -%}
-                <div class="stock-alert">
-                  <span class="svg-wrapper">
-                    {{- 'icon-inventory-status.svg' | inline_asset_content -}}
-                  </span>
-                  Only few left in stock!
-                </div>
+                  {%- render 'buy-buttons',
+                    block: block,
+                    product: product,
+                    product_form_id: product_form_id,
+                    section_id: section.id,
+                    show_multi_price: true
+                  -%}
+                  <div class="stock-alert">
+                    <span class="svg-wrapper">
+                      {{- 'icon-inventory-status.svg' | inline_asset_content -}}
+                    </span>
+                    Only few left in stock!
+                  </div>
                 {%- when 'custom_liquid' -%}
                   {{ block.settings.custom_liquid }}
-                  {%- when 'collapsible_tab' -%}
-                <div class="product__accordion accordion quick-add-hidden" {{ block.shopify_attributes }}>
-                  <details id="Details-{{ block.id }}-{{ section.id }}">
-                    <summary>
-                      <div class="summary__title">
-                        {% render 'icon-accordion', icon: block.settings.icon %}
-                        <h2 class="h4 accordion__title inline-richtext">
-                          {{ block.settings.heading | default: block.settings.page.title | escape }}
-                        </h2>
+                {%- when 'collapsible_tab' -%}
+                  <div class="product__accordion accordion quick-add-hidden" {{ block.shopify_attributes }}>
+                    <details id="Details-{{ block.id }}-{{ section.id }}">
+                      <summary>
+                        <div class="summary__title">
+                          {% render 'icon-accordion', icon: block.settings.icon %}
+                          <h2 class="h4 accordion__title inline-richtext">
+                            {{ block.settings.heading | default: block.settings.page.title | escape }}
+                          </h2>
+                        </div>
+                        <span class="accordion-icon accordion-icon--plus">
+                          {% render 'accordion-plus-icon' %}
+                        </span>
+                        <span class="accordion-icon accordion-icon--minus">
+                          {% render 'accordion-minus-icon' %}
+                        </span>
+                      </summary>
+                      <div class="accordion__content rte" id="ProductAccordion-{{ block.id }}-{{ section.id }}">
+                        {{ block.settings.content }}
+                        {{ block.settings.page.content }}
                       </div>
-                      <span class="accordion-icon accordion-icon--plus">
-                        {% render 'accordion-plus-icon' %}
-                      </span>
-                      <span class="accordion-icon accordion-icon--minus">
-                        {% render 'accordion-minus-icon' %}
-                      </span>
-                    </summary>
-                    <div class="accordion__content rte" id="ProductAccordion-{{ block.id }}-{{ section.id }}">
-                      {{ block.settings.content }}
-                      {{ block.settings.page.content }}
-                    </div>
-                  </details>
-                </div>
+                    </details>
+                  </div>
                 {%- when 'rating' -%}
                   {%- if product.metafields.reviews.rating.value != blank -%}
                     <div class="rating-wrapper">
