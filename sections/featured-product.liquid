@@ -134,14 +134,18 @@
 
                   <div class="svg-text-grid">
                     {% for i in (1..6) %}
-                      {% assign svg_image = block.settings["svg_icon_" | append: i] %}
-                      {% assign svg_text = block.settings["svg_text_" | append: i] %}
-                      {% if svg_text != blank or svg_image != blank %}
+                      {% assign icon_id = 'svg_icon_' | append: i %}
+                      {% assign text_id = 'svg_text_' | append: i %}
+                      {% assign svg_image = block.settings[icon_id] %}
+                      {% assign svg_text = block.settings[text_id] %}
+                      {% if svg_image or svg_text %}
                         <div class="svg-text-item">
                           {% if svg_image %}
                             <img src="{{ svg_image | image_url: width: 32 }}" alt="SVG Icon {{ i }}" class="svg-icon">
                           {% endif %}
-                          <span class="svg-text">{{ svg_text }}</span>
+                          {% if svg_text %}
+                            <span class="svg-text">{{ svg_text }}</span>
+                          {% endif %}
                         </div>
                       {% endif %}
                     {% endfor %}
