@@ -30,11 +30,17 @@
           "type": "description",
           "settings": {
             "svg_text_1": "Hands-Free Content Creation",
+            "svg_icon_1": "shopify://shop_images/Frame.svg",
             "svg_text_2": "Premium Adhesive Strength",
+            "svg_icon_2": "shopify://shop_images/Frame_1.svg",
             "svg_text_3": "Universal Compatibility",
+            "svg_icon_3": "shopify://shop_images/Frame_2.svg",
             "svg_text_4": "Vibrant Colors",
+            "svg_icon_4": "shopify://shop_images/Frame_3.svg",
             "svg_text_5": "Convenient and Easy to Use",
-            "svg_text_6": "Strong, Grippy Suction Cups"
+            "svg_icon_5": "shopify://shop_images/Frame_5.svg",
+            "svg_text_6": "Strong, Grippy Suction Cups",
+            "svg_icon_6": "shopify://shop_images/Frame_48099303.svg"
           }
         },
         "variant_selector_C3f7PJ": {
