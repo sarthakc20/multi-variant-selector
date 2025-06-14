@@ -160,7 +160,7 @@
 
 .buy-multi-wrapper .shipping-badge {
   position: absolute;
-  top: 0px;
+  bottom: -11px;
   left: 50%;
   transform: translateX(-50%);
   z-index: 1;
@@ -186,13 +186,13 @@
 }
 
 .badge--free-shipping {
-  background-color: var(--color-inverse);
-  color: var(--color-white);
+  background-color: var(--color-light-bg);
+  color: var(--color-badge-label);
 }
 
 .badge--shipping {
-  background-color: var(--color-light-bg);
-  color: var(--color-badge-label);
+  background-color: var(--color-inverse);
+  color: var(--color-white);
 }
 
 .buy-multi-btn {
