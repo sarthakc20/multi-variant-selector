@@ -910,7 +910,7 @@ a.product__text {
 
 .thumbnail-list {
   flex-wrap: wrap;
-  grid-gap: 1rem;
+  grid-gap: 2.4rem;
 }
 
 /* Fix to show some space at the end of our sliders in all browsers to be applied on thumbnails */
@@ -1002,7 +1002,7 @@ a.product__text {
 
 @media screen and (min-width: 900px) {
   .product--small .thumbnail-list.slider--tablet-up .thumbnail-list__item.slider__slide {
-    width: calc(25% - 0.8rem);
+    width: calc(25% - 7rem);
   }
 
   .thumbnail-list.slider--tablet-up .thumbnail-list__item.slider__slide {
@@ -1021,6 +1021,7 @@ a.product__text {
   color: rgb(var(--color-foreground));
   cursor: pointer;
   background-color: transparent;
+  border-radius: 6px;
 }
 
 .thumbnail:hover {
@@ -1032,8 +1033,9 @@ a.product__text {
 }
 
 .thumbnail[aria-current] {
-  box-shadow: 0 0 0rem 0.1rem rgb(var(--color-foreground));
-  border-color: rgb(var(--color-foreground));
+  box-shadow: 0 0 0rem 0.2rem rgb(var(--color-foreground));
+  border-color: var(--color-primary-text);
+  border-radius: 6px;
 }
 
 .image-magnify-full-size {
