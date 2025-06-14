@@ -443,10 +443,31 @@ if (addToCartBtn) {
                   {%- when 'variant_selector' -%}
                 {%- comment -%} Swatch block, renders outside any form {%- endcomment -%}
                 <div class="buy-multi-toggle">
-                  <button type="button" class="buy-multi-btn" data-max="1">Buy 1 Sticky Grippy 10.00</button>
-                  <button type="button" class="buy-multi-btn active" data-max="3">Buy 3 Sticky Grippy 25.20</button>
-                  <button type="button" class="buy-multi-btn" data-max="5">Buy 5 Sticky Grippy 40.00</button>
+                  <button type="button" class="buy-multi-btn" data-max="1">
+                    <span class="buy-text">{{ block.settings.button1_text }}</span>
+                    <span class="buy-price">{{ block.settings.button1_price }}</span>
+                    {% if block.settings.button1_image %}
+                      <img src="{{ block.settings.button1_image | img_url: '100x' }}" alt="Button 1 Image" class="buy-img" />
+                    {% endif %}
+                  </button>
+
+                  <button type="button" class="buy-multi-btn active" data-max="3">
+                    <span class="buy-text">{{ block.settings.button2_text }}</span>
+                    <span class="buy-price">{{ block.settings.button2_price }}</span>
+                    {% if block.settings.button2_image %}
+                      <img src="{{ block.settings.button2_image | img_url: '100x' }}" alt="Button 2 Image" class="buy-img" />
+                    {% endif %}
+                  </button>
+
+                  <button type="button" class="buy-multi-btn" data-max="5">
+                    <span class="buy-text">{{ block.settings.button3_text }}</span>
+                    <span class="buy-price">{{ block.settings.button3_price }}</span>
+                    {% if block.settings.button3_image %}
+                      <img src="{{ block.settings.button3_image | img_url: '100x' }}" alt="Button 3 Image" class="buy-img" />
+                    {% endif %}
+                  </button>
                 </div>
+
                 <div class="choose_color-info-container">
                   <p>Choose your color</p>
                   <span class="multi-buy-per-item"></span>
@@ -944,7 +965,61 @@ if (addToCartBtn) {
     {
       "type": "variant_selector",
       "name": "Variant Selector",
-      "limit": 1
+      "limit": 1,
+      "settings": [
+        {
+          "type": "text",
+          "id": "button1_text",
+          "label": "Button 1 Text",
+          "default": "Buy 1 Sticky Grippy"
+        },
+        {
+          "type": "text",
+          "id": "button1_price",
+          "label": "Button 1 Price",
+          "default": "₹10.00"
+        },
+        {
+          "type": "image_picker",
+          "id": "button1_image",
+          "label": "Button 1 Image"
+        },
+        {
+          "type": "text",
+          "id": "button2_text",
+          "label": "Button 2 Text",
+          "default": "Buy 3 Sticky Grippy"
+        },
+        {
+          "type": "text",
+          "id": "button2_price",
+          "label": "Button 2 Price",
+          "default": "₹25.20"
+        },
+        {
+          "type": "image_picker",
+          "id": "button2_image",
+          "label": "Button 2 Image"
+        },
+
+        {
+          "type": "text",
+          "id": "button3_text",
+          "label": "Button 3 Text",
+          "default": "Buy 5 Sticky Grippy"
+        },
+        {
+          "type": "text",
+          "id": "button3_price",
+          "label": "Button 3 Price",
+          "default": "₹40.00"
+        },
+        {
+          "type": "image_picker",
+          "id": "button3_image",
+          "label": "Button 3 Image"
+        }
+      ]
     },
     {
       "type": "share",
