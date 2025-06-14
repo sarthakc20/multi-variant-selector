@@ -131,22 +131,6 @@
                   <div class="product__description" {{ block.shopify_attributes }}>
                     <p>{{ product.description }}</p>
                   </div>
-
-                  <div class="svg-text-grid">
-                    {% for i in (1..6) %}
-                      {% assign svg_image = block.settings["svg_icon_" | append: i] %}
-                      {% assign svg_text = block.settings["svg_text_" | append: i] %}
-                      {% if svg_text != blank or svg_image != blank %}
-                        <div class="svg-text-item">
-                          {% if svg_image %}
-                            <img src="{{ svg_image | image_url: width: 32 }}" alt="SVG Icon {{ i }}" class="svg-icon">
-                          {% endif %}
-                          <span class="svg-text">{{ svg_text }}</span>
-                        </div>
-                      {% endif %}
-                    {% endfor %}
-                  </div>
-
                 {%- when 'price' -%}
                   <div id="price-{{ section.id }}" role="status" {{ block.shopify_attributes }}>
                     {%- render 'price',
