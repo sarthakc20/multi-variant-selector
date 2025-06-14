@@ -7,6 +7,7 @@
 .featured-product .product-media-container {
   margin-bottom: var(--media-shadow-vertical-offset);
   max-width: 100%;
+  border-radius: 20px;
 }
 
 .featured-product .product__media-item {
