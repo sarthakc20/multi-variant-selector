@@ -157,6 +157,26 @@
   width: fit-content;
 }
 
+
+.buy-multi-wrapper .shipping-badge {
+  position: absolute;
+  top: 0px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 1;
+  display: inline-flex;
+  gap: 10px;
+  font-size: 14px;
+  font-weight: 500;
+  border-radius: 36px;
+  border: none;
+  padding: 3px 12px;
+  font-family: var(--font-primary);
+  align-items: center;
+  white-space: nowrap;
+  width: fit-content;
+}
+
 .badge--popular {
   background-color: var(--color-highlight);
 }
@@ -165,6 +185,15 @@
   background-color: var(--color-alternative);
 }
 
+.badge--free-shipping {
+  background-color: var(--color-inverse);
+  color: var(--color-white);
+}
+
+.badge--shipping {
+  background-color: var(--color-light-bg);
+  color: var(--color-badge-label);
+}
 
 .buy-multi-btn {
   padding: 25.5px 16px;
