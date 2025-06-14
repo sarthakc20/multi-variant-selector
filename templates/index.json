@@ -54,6 +54,7 @@
         "text_PmCi93": {
           "type": "text",
           "settings": {
+            "enable_stars": true,
             "text": "2000+ Verified 5-Star Reviews*",
             "text_style": "subtitle"
           }
@@ -147,12 +148,13 @@
         "collapsible_tab_mDFxxa"
       ],
       "settings": {
+        "enable_sticky_info": true,
         "product": "original-stickygrippy",
         "color_scheme": "",
         "secondary_background": false,
         "media_size": "small",
         "constrain_to_viewport": true,
-        "media_fit": "contain",
+        "media_fit": "cover",
         "media_position": "left",
         "gallery_layout": "thumbnail_slider",
         "mobile_thumbnails": "show",
