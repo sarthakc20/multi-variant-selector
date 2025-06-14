@@ -131,6 +131,22 @@
                   <div class="product__description" {{ block.shopify_attributes }}>
                     <p>{{ product.description }}</p>
                   </div>
+
+                  <div class="svg-text-grid">
+                    {% for i in (1..6) %}
+                      {% assign svg_image = block.settings["svg_icon_" | append: i] %}
+                      {% assign svg_text = block.settings["svg_text_" | append: i] %}
+                      {% if svg_text != blank or svg_image != blank %}
+                        <div class="svg-text-item">
+                          {% if svg_image %}
+                            <img src="{{ svg_image | image_url: width: 32 }}" alt="SVG Icon {{ i }}" class="svg-icon">
+                          {% endif %}
+                          <span class="svg-text">{{ svg_text }}</span>
+                        </div>
+                      {% endif %}
+                    {% endfor %}
+                  </div>
+
                 {%- when 'price' -%}
                   <div id="price-{{ section.id }}" role="status" {{ block.shopify_attributes }}>
                     {%- render 'price',
@@ -510,7 +526,69 @@
     {
       "type": "description",
       "name": "Product Description",
-      "limit": 1
+      "limit": 1,
+      "settings": [
+        {
+          "type": "inline_richtext",
+          "id": "svg_text_1",
+          "label": "SVG Text 1"
+        },
+        {
+          "type": "image_picker",
+          "id": "svg_icon_1",
+          "label": "SVG Icon 1"
+        },
+        {
+          "type": "inline_richtext",
+          "id": "svg_text_2",
+          "label": "SVG Text 2"
+        },
+        {
+          "type": "image_picker",
+          "id": "svg_icon_2",
+          "label": "SVG Icon 2"
+        },
+        {
+          "type": "inline_richtext",
+          "id": "svg_text_3",
+          "label": "SVG Text 3"
+        },
+        {
+          "type": "image_picker",
+          "id": "svg_icon_3",
+          "label": "SVG Icon 3"
+        },
+        {
+          "type": "inline_richtext",
+          "id": "svg_text_4",
+          "label": "SVG Text 4"
+        },
+        {
+          "type": "image_picker",
+          "id": "svg_icon_4",
+          "label": "SVG Icon 4"
+        },
+        {
+          "type": "inline_richtext",
+          "id": "svg_text_5",
+          "label": "SVG Text 5"
+        },
+        {
+          "type": "image_picker",
+          "id": "svg_icon_5",
+          "label": "SVG Icon 5"
+        },
+        {
+          "type": "inline_richtext",
+          "id": "svg_text_6",
+          "label": "SVG Text 6"
+        },
+        {
+          "type": "image_picker",
+          "id": "svg_icon_6",
+          "label": "SVG Icon 6"
+        }
+      ]
     },
     {
       "type": "sku",
