@@ -361,7 +361,7 @@ if (addToCartBtn) {
         <div class="product__info-wrapper grid__item{% if settings.animations_reveal_on_scroll %} scroll-trigger animate--slide-in{% endif %}">
           <section
             id="ProductInfo-{{ section.id }}"
-            class="product__info-container"
+            class="product__info-container {% if section.settings.enable_sticky_info %} product__column-sticky{% endif %}"
             data-section="{{ section.id }}"
             data-url="{{ product.url }}"
           >
@@ -622,17 +622,6 @@ if (addToCartBtn) {
                   {% render 'icon-with-text', block: block %}
               {%- endcase -%}
             {%- endfor -%}
-            <a
-              {% if product == blank %}
-                role="link" aria-disabled="true"
-              {% else %}
-                href="{{ product.url }}"
-              {% endif %}
-              class="link product__view-details animate-arrow"
-            >
-              {{ 'products.product.view_full_details' | t }}
-              {{- 'icon-arrow.svg' | inline_asset_content -}}
-            </a>
           </section>
         </div>
       </div>
@@ -1748,6 +1737,12 @@ if (addToCartBtn) {
     }
   ],
   "settings": [
+    {
+      "type": "checkbox",
+      "id": "enable_sticky_info",
+      "default": true,
+      "label": "t:sections.main-product.settings.enable_sticky_info.label"
+    },
     {
       "type": "product",
       "id": "product",
