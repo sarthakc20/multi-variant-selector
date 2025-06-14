@@ -534,4 +534,50 @@
   .buy-multi-btn buy-price {
     font-size: 16px;
   }
+
+  .choose_color-info {
+    gap: 8px;
+  }
+
+  .multi-buy-per-item {
+    font-size: 10px;
+  }
+
+  .multi-buy-save {
+    font-size: 11px;
+    padding: 2px 4px;
+  }
+
+  .selected-colors-summary,
+  .selected-colors-text,
+  .stock-alert {
+    font-size: 14px;
+  }
+
+  .icon-with-text--horizontal {
+    flex-direction: column;
+    padding: 0 86px;
+  }
+
+  .icon-with-text__item span {
+    font-size: 12px;
+  }
+
+  .icon-with-text__paragraph {
+    font-size: 12px;
+  }
+
+  .accordion__title {
+    font-size: 16px;
+    font-weight: 600;
+  }
+
+  .accordion__content {
+    font-size: 14px;
+    font-weight: 400;
+  }
+
+  .featured-product .thumbnail-slider {
+    padding: 0 10px;
+  }
 }
