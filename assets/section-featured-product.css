@@ -157,6 +157,7 @@
   width: fit-content;
 }
 
+
 .buy-multi-wrapper .shipping-badge {
   position: absolute;
   bottom: -11px;
@@ -248,7 +249,7 @@
 }
 
 .variant-swatch.selected {
-  border: 2px solid var(--color-highlight);
+  border: 2px solid #222;
 }
 
 .variant-swatch[disabled] {
