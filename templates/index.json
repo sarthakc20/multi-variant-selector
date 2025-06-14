@@ -94,11 +94,14 @@
           "settings": {
             "layout": "horizontal",
             "icon_1": "heart",
-            "heading_1": "Heading",
+            "image_1": "shopify://shop_images/material-symbols_delivery-truck-speed_2.svg",
+            "heading_1": "FREE Shipping",
             "icon_2": "return",
-            "heading_2": "Heading",
+            "image_2": "shopify://shop_images/fluent-mdl2_return-to-session.svg",
+            "heading_2": "Free 30-Day Returns",
             "icon_3": "truck",
-            "heading_3": "Heading"
+            "image_3": "shopify://shop_images/mdi_sale.svg",
+            "heading_3": "Best Deal Yet – Upto 65% OFF!"
           }
         },
         "collapsible_tab_7dtpJq": {
