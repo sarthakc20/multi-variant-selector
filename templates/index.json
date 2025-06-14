@@ -70,7 +70,17 @@
         },
         "variant_selector_C3f7PJ": {
           "type": "variant_selector",
-          "settings": {}
+          "settings": {
+            "button1_text": "Buy 1 Sticky Grippy",
+            "button1_price": "₹10.00",
+            "button1_image": "shopify://shop_images/a6bcc0b90617380c229c16a9fea29e32c7829167.png",
+            "button2_text": "Buy 3 Sticky Grippy",
+            "button2_price": "₹25.20",
+            "button2_image": "shopify://shop_images/Frame_48098102.png",
+            "button3_text": "Buy 5 Sticky Grippy",
+            "button3_price": "₹40.00",
+            "button3_image": "shopify://shop_images/Group_181.webp"
+          }
         },
         "price_VGF78b": {
           "type": "price",
