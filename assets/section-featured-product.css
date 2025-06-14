@@ -407,10 +407,10 @@
   color: var(--color-primary-text);
 }
 
-.featured-product .product__accordion:first-of-type {
-  padding-top: 40px !important;
-  border-top-left-radius: 20px !important;
-  border-top-right-radius: 20px !important;
+.featured-product :not(.accordion) + .accordion {
+  padding-top: 40px;
+  border-top-left-radius: 20px;
+  border-top-right-radius: 20px;
 }
 
 .featured-product .accordion:last-of-type {
