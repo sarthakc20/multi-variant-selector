@@ -309,6 +309,7 @@
 .choose_color-info {
   display: flex;
   gap: 14px;
+  align-items: center;
 }
 
 .choose_color-info-container p {
