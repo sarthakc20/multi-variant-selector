@@ -135,12 +135,11 @@
         "collapsible_tab_ngnx7P",
         "collapsible_tab_mDFxxa"
       ],
-      "name": "t:sections.featured-product.presets.name",
       "settings": {
         "product": "original-stickygrippy",
         "color_scheme": "",
         "secondary_background": false,
-        "media_size": "medium",
+        "media_size": "small",
         "constrain_to_viewport": true,
         "media_fit": "contain",
         "media_position": "left",
