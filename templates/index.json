@@ -95,7 +95,7 @@
             "layout": "horizontal",
             "icon_1": "heart",
             "image_1": "shopify://shop_images/material-symbols_delivery-truck-speed_2.svg",
-            "heading_1": "FREE Shipping",
+            "heading_1": "<strong>FREE Shipping<b</strong>On all orders over $25 — nohidden fees, no fuss. Juststick, grip, and create.",
             "icon_2": "return",
             "image_2": "shopify://shop_images/fluent-mdl2_return-to-session.svg",
             "heading_2": "Free 30-Day Returns",
