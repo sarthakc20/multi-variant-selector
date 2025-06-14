@@ -233,6 +233,46 @@
   margin-bottom: 0.5em;
 }
 
+.variant-swatch {
+  width: 46px;
+  height: 46px;
+  border-radius: 50%;
+  border: 2px solid #eee;
+  background: #CECECE;
+  cursor: pointer;
+  padding: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  position: relative;
+}
+
+.variant-swatch.selected {
+  border: 2px solid #222;
+}
+
+.variant-swatch[disabled] {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+.variant-swatch img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  border-radius: 50%;
+  display: block;
+}
+
+.swatch-placeholder {
+  width: 100%;
+  height: 100%;
+  background: #eee;
+  border-radius: 50%;
+  display: block;
+}
+
 .swatch-qty-overlay {
   position: absolute;
   top: 0;
