@@ -28,7 +28,14 @@
         },
         "description_gXEUrz": {
           "type": "description",
-          "settings": {}
+          "settings": {
+            "svg_text_1": "Hands-Free Content Creation",
+            "svg_text_2": "Premium Adhesive Strength",
+            "svg_text_3": "Universal Compatibility",
+            "svg_text_4": "Vibrant Colors",
+            "svg_text_5": "Convenient and Easy to Use",
+            "svg_text_6": "Strong, Grippy Suction Cups"
+          }
         },
         "variant_selector_C3f7PJ": {
           "type": "variant_selector",
