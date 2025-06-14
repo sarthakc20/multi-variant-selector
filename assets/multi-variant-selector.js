@@ -81,16 +81,15 @@ document.addEventListener("DOMContentLoaded", function () {
       let sel = selections[selIndex];
 
       if (sel) {
-        // If not at max, just increment
+        // Only increment if totalSelected < maxSelect
         if (totalSelected() < maxSelect) {
           sel.count++;
-        } else {
-          // At max, increment this one, and decrement/remove others (oldest first, but not this one)
+        } else if (sel.count < maxSelect) {
+          // At max, but this swatch is not at max, so increment and remove from others
           sel.count++;
           let toReduce = 1;
-          // Remove from the oldest selections except the current one
           for (let i = 0; i < selections.length && toReduce > 0; i++) {
-            if (selections[i].id !== vid) {
+            if (selections[i].id !== vid && selections[i].count > 0) {
               if (selections[i].count > toReduce) {
                 selections[i].count -= toReduce;
                 toReduce = 0;
@@ -102,6 +101,10 @@ document.addEventListener("DOMContentLoaded", function () {
           }
           // Remove any with count 0
           selections = selections.filter((s) => s.count > 0);
+        }
+        // Prevent this swatch from exceeding maxSelect
+        if (sel.count > maxSelect) {
+          sel.count = maxSelect;
         }
       } else {
         // Not selected yet
@@ -119,9 +122,7 @@ document.addEventListener("DOMContentLoaded", function () {
               selections[i].count = 0;
             }
           }
-          // Remove any with count 0
           selections = selections.filter((s) => s.count > 0);
-          // Add the new selection
           selections.push({ id: vid, title: title, count: 1 });
         }
       }
