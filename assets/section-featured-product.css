@@ -82,7 +82,7 @@
   width: 46px;
   height: 46px;
   border-radius: 50%;
-  border: 2px solid #CECECE;
+  border: 2px solid #cecece;
   background: #fff;
   cursor: pointer;
   padding: 0;
@@ -150,7 +150,6 @@
   white-space: nowrap;
   width: fit-content;
 }
-
 
 .buy-multi-wrapper .shipping-badge {
   position: absolute;
@@ -277,7 +276,26 @@
 }
 
 .selected-colors-summary {
-  min-height: 1.5em;
+  font-family: var(--font-primary);
+  font-weight: 600;
+  font-size: 16px;
+  line-height: 26.6px;
+  letter-spacing: 0%;
+  vertical-align: middle;
+  text-transform: capitalize;
+  color: var(--color-primary-text);
+}
+
+.selected-colors-text {
+  font-family: var(--font-secondary);
+  font-weight: 400;
+  font-style: italic;
+  font-size: 16px;
+  line-height: 26.6px;
+  letter-spacing: 0%;
+  vertical-align: middle;
+  text-transform: capitalize;
+  color: #373A36;
 }
 
 .choose_color-info-container {

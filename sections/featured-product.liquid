@@ -11,6 +11,7 @@ document.addEventListener('DOMContentLoaded', function() {
   const swatchSelector = '.variant-swatch';
   const buyBtnSelector = '.buy-multi-btn';
   const summarySelector = '.selected-colors-summary';
+  const summaryTextSelector = '.selected-colors-text';
   const addToCartSelector = 'form[data-type="add-to-cart-form"] [type="submit"]';
   const hiddenInputSelector = 'form[data-type="add-to-cart-form"] input[name="id"]';
 
@@ -164,10 +165,16 @@ updateDiscountText();
       }
     });
     const summaryDiv = document.querySelector(summarySelector);
-    if (selections.length === 0) {
-      summaryDiv.textContent = 'Selected Colors:';
-    } else {
-      summaryDiv.textContent = 'Selected Colors: ' + selections.map(s => `${s.title}(${s.count})`).join(', ');
+    const summaryTextSpan = document.querySelector(summaryTextSelector);
+
+    if (summaryDiv && summaryTextSpan) {
+      if (selections.length === 0) {
+        summaryTextSpan.textContent = '';
+      } else {
+        summaryTextSpan.textContent = selections
+          .map(s => `${s.title}(${s.count})`)
+          .join(', ');
+      }
     }
     if (addToCartBtn) {
       addToCartBtn.disabled = (totalSelected() !== maxSelect);
@@ -532,7 +539,7 @@ if (addToCartBtn) {
                     </button>
                   {% endfor %}
                 </div>
-                <div class="selected-colors-summary" style="margin: 0.5em 0 1em 0; font-size: 0.95em;">Selected Colors:</div>
+                <div class="selected-colors-summary">Selected Colors:<span class="selected-colors-text"></span></div>
 
                 {%- when 'buy_buttons' -%}
                 {%- render 'buy-buttons',
