@@ -89,6 +89,14 @@
             "show_gift_card_recipient": false
           }
         },
+        "inventory_kwiMNE": {
+          "type": "inventory",
+          "settings": {
+            "text_style": "body",
+            "inventory_threshold": 10,
+            "show_inventory_quantity": true
+          }
+        },
         "icon_with_text_zPmDpk": {
           "type": "icon-with-text",
           "settings": {
@@ -135,6 +143,7 @@
         "description_gXEUrz",
         "variant_selector_C3f7PJ",
         "buy_buttons_6tVpdL",
+        "inventory_kwiMNE",
         "icon_with_text_zPmDpk",
         "collapsible_tab_7dtpJq",
         "collapsible_tab_ngnx7P",
