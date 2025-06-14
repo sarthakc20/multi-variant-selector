@@ -434,12 +434,15 @@
   display: none;
 }
 
-/* When accordion is open: hide plus, show minus */
 .product__accordion details[open] .accordion-icon--plus {
   display: none;
 }
 .product__accordion details[open] .accordion-icon--minus {
   display: inline-block;
+}
+
+.featured-product .accordion .accordion__content {
+  padding: 0;
 }
 
 
