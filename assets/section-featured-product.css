@@ -143,10 +143,14 @@
   line-height: 1.4;
   display: flex;
   flex-direction: column;
-  align-items: flex-start;
+  align-items: center;
   gap: 8px;
-  text-align: left;
+  text-align: center;
   transition: all 0.3s ease;
+}
+
+.last-child-multi-btn {
+  padding: 25.5px 9.5px;
 }
 
 .buy-multi-btn.active {
@@ -155,9 +159,8 @@
 }
 
 .buy-img {
-  width: 40px;
-  height: 40px;
-  object-fit: cover;
+  max-width: 100%;
+  height: 86px;
 }
 
 .variant-swatches {
