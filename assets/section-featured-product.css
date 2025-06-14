@@ -128,16 +128,20 @@
 .buy-multi-toggle {
   display: flex;
   gap: 24px;
-  position: relative;
   margin-bottom: 1em;
 }
 
-.buy-multi-toggle .badge {
+.buy-multi-wrapper {
+  position: relative;
+  display: inline-block;
+}
+
+.buy-multi-wrapper .badge {
   position: absolute;
-  top: -10px;
+  top: -12px;
   left: 50%;
   transform: translateX(-50%);
-  z-index: 2;
+  z-index: 1;
   display: inline-flex;
   gap: 6px;
   font-size: 14px;
