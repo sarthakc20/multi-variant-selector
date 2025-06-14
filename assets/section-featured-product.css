@@ -529,6 +529,11 @@
 
   .buy-multi-btn {
     font-size: 12px;
+    padding: 12.5px 15px;
+  }
+
+  .last-child-multi-btn {
+    padding: 12.5px 8.5px;
   }
 
   .buy-multi-btn buy-price {
@@ -579,5 +584,9 @@
 
   .featured-product .thumbnail-slider {
     padding: 0 10px;
+  }
+
+  .icon-with-text--horizontal .icon-with-text__item {
+    width: 100%;
   }
 }
